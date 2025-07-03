@@ -49,28 +49,82 @@
 
 #include "ops.c" // misc, too clogged otherwise
 
-#define HEN_REPO_URL "http://917hu8k0n73n7.psp2.dev/hen/"
+#define HEN_REPO_URL "https://tecnorodriguez.github.io/henlo_payloads/"
+#define AUTO_VPK_FNAME "auto.vpk"
+#define VITASHELL_VPK_FNAME "vs.vpk"
 #define VDEP_VPK_FNAME "vdep.vpk"
 #define TAIHEN_K_FNAME "taihen.skprx"
-#define TAIHEN_C_FNAME "config.txt" // default config.txt
+#define TAIHEN_C_FNAME "config.txt"
 #define HENKAKU_K_FNAME "henkaku.skprx"
 #define HENKAKU_U_FNAME "henkaku.suprx"
 #define GAMESD_FNAME "gamesd.skprx"
 #define TEMP_UX0_PATH "ux0:temp/"
 #define TEMP_UR0_PATH "ur0:temp/"
+#define BOOTSTRAP_VERSION_STR "henlo-bootstrap v1.0.4 TecnoRodriguez"
+#define OPTION_COUNT 8
 
-#define BOOTSTRAP_VERSION_STR "henlo-bootstrap v1.0.4 by skgleba"
-
-#define OPTION_COUNT 6
 enum E_MENU_OPTIONS {
     MENU_EXIT = 0,
     MENU_INSTALL_HENKEK,
     MENU_INSTALL_VDEP,
     MENU_REPLACE_NEAR,
     MENU_RESET_TAICFG,
-    MENU_EXIT_W_SD2VITA
+    MENU_EXIT_W_SD2VITA,
+    MENU_INSTALL_AUTO,
+    MENU_INSTALL_VITASHELL
 };
-const char* menu_items[OPTION_COUNT] = { "Exit", "Install henkaku", "Install VitaDeploy", "Replace NEAR with VitaDeploy", "Reset taihen config.txt", "Exit and mount sd2vita to ux0" };
+
+const char* menu_items[OPTION_COUNT] = {
+    "Exit",
+    "Install henkaku",
+    "Install VitaDeploy",
+    "Replace NEAR with VitaDeploy",
+    "Reset taihen config.txt",
+    "Exit and mount sd2vita to ux0",
+    "Install Auto",
+    "Install VitaShell"
+};
+
+// Funciones install_auto y install_vitashell
+int install_auto() {
+    sceIoMkdir(TEMP_UX0_PATH, 0777);
+    COLORPRINTF(COLOR_CYAN, "Downloading auto.vpk\n");
+    net(1);
+    int res = download_file(HEN_REPO_URL AUTO_VPK_FNAME, TEMP_UX0_PATH AUTO_VPK_FNAME, TEMP_UX0_PATH AUTO_VPK_FNAME "_tmp", 0);
+    net(0);
+    if (res < 0) return res;
+    COLORPRINTF(COLOR_CYAN, "Extracting vpk\n");
+    removeDir(TEMP_UX0_PATH "app");
+    sceIoMkdir(TEMP_UX0_PATH "app", 0777);
+    res = unzip(TEMP_UX0_PATH AUTO_VPK_FNAME, TEMP_UX0_PATH "app");
+    if (res < 0) return res;
+    COLORPRINTF(COLOR_CYAN, "Promoting app\n");
+    res = promoteApp(TEMP_UX0_PATH "app");
+    if (res < 0) return res;
+    COLORPRINTF(COLOR_GREEN, "Auto instalado\n");
+    sceKernelDelayThread(2 * 1000 * 1000);
+    return 0;
+}
+
+int install_vitashell() {
+    sceIoMkdir(TEMP_UX0_PATH, 0777);
+    COLORPRINTF(COLOR_CYAN, "Downloading vs.vpk\n");
+    net(1);
+    int res = download_file(HEN_REPO_URL VITASHELL_VPK_FNAME, TEMP_UX0_PATH VITASHELL_VPK_FNAME, TEMP_UX0_PATH VITASHELL_VPK_FNAME "_tmp", 0);
+    net(0);
+    if (res < 0) return res;
+    COLORPRINTF(COLOR_CYAN, "Extracting vpk\n");
+    removeDir(TEMP_UX0_PATH "app");
+    sceIoMkdir(TEMP_UX0_PATH "app", 0777);
+    res = unzip(TEMP_UX0_PATH VITASHELL_VPK_FNAME, TEMP_UX0_PATH "app");
+    if (res < 0) return res;
+    COLORPRINTF(COLOR_CYAN, "Promoting app\n");
+    res = promoteApp(TEMP_UX0_PATH "app");
+    if (res < 0) return res;
+    COLORPRINTF(COLOR_GREEN, "VitaShell instalado\n");
+    sceKernelDelayThread(2 * 1000 * 1000);
+    return 0;
+}
 
 int __attribute__((naked, noinline)) call_syscall(int a1, int a2, int a3, int num) {
     __asm__(
