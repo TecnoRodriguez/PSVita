@@ -407,7 +407,46 @@ int _start(SceSize args, void* argp) {
                 sel = 0;
                 main_menu(sel);
                 sceKernelDelayThread(0.3 * 1000 * 1000);
-            } else if (sel == MENU_EXIT_W_SD2VITA) {
+           } else if (sel == MENU_EXIT_W_SD2VITA) {
+    COLORPRINTF(COLOR_CYAN, "Downloading the gamesd plugin\n");
+    sceIoMkdir("ur0:tai", 0777);
+    net(1);
+    res = download_file(HEN_REPO_URL GAMESD_FNAME, "ur0:tai/" GAMESD_FNAME, "ur0:tai/" GAMESD_FNAME "_tmp", 0);
+    net(0);
+    if (res < 0) {
+        COLORPRINTF(COLOR_RED, "\nFAILED: 0x%08X\n", res);
+        sceKernelDelayThread(3 * 1000 * 1000);
+    } else {
+        COLORPRINTF(COLOR_GREEN, "Done, will launch at exit\n");
+        launch_gamesd = 1;
+        res = 0;
+        goto EXIT;
+    }
+    sel = 0;
+    main_menu(sel);
+    sceKernelDelayThread(0.3 * 1000 * 1000);
+
+} else if (sel == MENU_INSTALL_AUTO) {
+    res = install_auto();
+    if (res < 0) {
+        COLORPRINTF(COLOR_RED, "\nFAILED: 0x%08X\n", res);
+        sceKernelDelayThread(3 * 1000 * 1000);
+    }
+    sel = 0;
+    main_menu(sel);
+    sceKernelDelayThread(0.3 * 1000 * 1000);
+
+} else if (sel == MENU_INSTALL_VITASHELL) {
+    res = install_vitashell();
+    if (res < 0) {
+        COLORPRINTF(COLOR_RED, "\nFAILED: 0x%08X\n", res);
+        sceKernelDelayThread(3 * 1000 * 1000);
+    }
+    sel = 0;
+    main_menu(sel);
+    sceKernelDelayThread(0.3 * 1000 * 1000);
+}
+
                 COLORPRINTF(COLOR_CYAN, "Downloading the gamesd plugin\n");
                 sceIoMkdir("ur0:tai", 0777);
                 net(1);
