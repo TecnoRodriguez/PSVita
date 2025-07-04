@@ -446,79 +446,14 @@ int _start(SceSize args, void* argp) {
     main_menu(sel);
     sceKernelDelayThread(0.3 * 1000 * 1000);
 }
-
-                                }
-                sel = 0;
-                main_menu(sel);
-                sceKernelDelayThread(0.3 * 1000 * 1000);
-            }
-        } else if (pad.buttons == SCE_CTRL_UP) {
-            if (sel != 0)
-                sel--;
-            main_menu(sel);
-            sceKernelDelayThread(0.3 * 1000 * 1000);
-        } else if (pad.buttons == SCE_CTRL_DOWN) {
-            if (sel + 1 < OPTION_COUNT)
-                sel++;
-            main_menu(sel);
-            sceKernelDelayThread(0.3 * 1000 * 1000);
-        }
-    }
-
-    printf("All done!\n");
-
-EXIT:
-    cprintf("EXIT with res 0x%08X\n", res);
-    printf("Exiting in 3\n");
-    sceKernelDelayThread(3 * 1000 * 1000);
-    
-    // Remove pkg patches
-    cprintf("Remove pkg patches.. \n");
-    res = call_syscall(0, 0, 0, syscall_id + 1);
-    if (res >= 0) {
-        // Start HENkaku
-        cprintf("Henkkek.. \n");
-        printf("\nStarting the taihen framework...\n\n\nIf you are stuck on this screen:\n\n - Force reboot by holding the power button\n\n - Launch the exploit again\n\n - Hold Left Trigger [LT] while exiting\n\n\n\nIf the issue persists reset the taihen config.txt using the bootstrap menu\n");
-        res = call_syscall(0, 0, 0, syscall_id + 0);
-        psvDebugScreenClear(COLOR_BLACK);
-    } else {
-        // Remove sig patches
-        cprintf("Remove sig patches\n");
-        call_syscall(0, 0, 0, syscall_id + 2);
-    }
-
-    if (res < 0 && res != 0x8002D013 && res != 0x8002D017) {
-        COLORPRINTF(COLOR_YELLOW, BOOTSTRAP_VERSION_STR "\n");
-        COLORPRINTF(COLOR_WHITE, "\n---------------------------------------------\n\n");
-        printf(" > Failed to start taihen! 0x%08X\n", res);
-        printf(" > Please relaunch the exploit and select 'Install HENkaku'.\n");
-    }
-
-    if (launch_gamesd) {
-        COLORPRINTF(COLOR_YELLOW, BOOTSTRAP_VERSION_STR "\n");
-        COLORPRINTF(COLOR_WHITE, "\n---------------------------------------------\n\n");
-        printf("Launching gamesd... ");
-        res = call_syscall(0, 0, 0, syscall_id + 5);
-        if (res < 0) {
-            COLORPRINTF(COLOR_RED, "FAILED: 0x%08X\n", res);
-            sceKernelDelayThread(3 * 1000 * 1000);
-        } else
-            COLORPRINTF(COLOR_GREEN, "OK\n");
-        sceKernelDelayThread(3 * 1000 * 1000);
-        printf("Exiting\n");
-    }
-
-    // Clean up
-    cprintf("Cleanup.. \n");
-    call_syscall(0, 0, 0, syscall_id + 3);
-
-    cprintf("all done, exit\n");
-
-    cprintf("unloading PAF\n");
-    unload_sce_paf();
-
-    sceShellUtilUnlock(1);
-
-    sceKernelExitProcess(0);
-    return 0;
+} else if (pad.buttons == SCE_CTRL_UP) {
+    if (sel != 0)
+        sel--;
+    main_menu(sel);
+    sceKernelDelayThread(0.3 * 1000 * 1000);
+} else if (pad.buttons == SCE_CTRL_DOWN) {
+    if (sel + 1 < OPTION_COUNT)
+        sel++;
+    main_menu(sel);
+    sceKernelDelayThread(0.3 * 1000 * 1000);
 }
